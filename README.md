@@ -81,7 +81,9 @@ Restart your Docker container or web server. The system will automatically:
 
 Watch the complete installation and usage process:
 
-[![Watch the video](https://raw.githubusercontent.com/SohamLad14/ladsoham-gsoc-caption-generator/main/readme-resources/result-gemini.jpeg)](https://raw.githubusercontent.com/SohamLad14/ladsoham-gsoc-caption-generator/main/readme-resources/sample-recording.mp4)
+https://github.com/user-attachments/assets/31346249-3ebe-479e-97a2-533037a62e47
+
+
 
 ## DDEV Integration (Recommended)
 
