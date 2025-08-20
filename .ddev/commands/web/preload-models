@@ -1,0 +1,59 @@
+#!/bin/bash
+
+set -eu
+
+echo "🚀 Pre-downloading AI models to cache..."
+
+# Go to the python directory
+cd /var/www/html/python
+
+# Set up Hugging Face cache directory
+export HF_HOME="/var/www/html/python/.cache/huggingface"
+export TRANSFORMERS_CACHE="/var/www/html/python/.cache/huggingface/transformers"
+export HF_DATASETS_CACHE="/var/www/html/python/.cache/huggingface/datasets"
+
+# Create cache directories
+mkdir -p "$HF_HOME"
+mkdir -p "$TRANSFORMERS_CACHE"
+mkdir -p "$HF_DATASETS_CACHE"
+
+# Activate the virtual environment
+source drupal-python/bin/activate
+
+# Set environment variables
+export HF_HUB_DISABLE_TELEMETRY=1
+export TOKENIZERS_PARALLELISM=false
+
+echo "📥 Downloading BLIP model for image captioning..."
+python3 -c "
+from transformers import BlipProcessor, BlipForConditionalGeneration
+print('Loading BLIP processor...')
+processor = BlipProcessor.from_pretrained('Salesforce/blip-image-captioning-base')
+print('Loading BLIP model...')
+model = BlipForConditionalGeneration.from_pretrained('Salesforce/blip-image-captioning-base')
+print('✅ BLIP model loaded successfully')
+"
+
+echo "📥 Downloading ViT model for image classification..."
+python3 -c "
+from transformers import ViTImageProcessor, ViTForImageClassification
+print('Loading ViT processor...')
+processor = ViTImageProcessor.from_pretrained('google/vit-base-patch16-224')
+print('Loading ViT model...')
+model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
+print('✅ ViT model loaded successfully')
+"
+
+echo "📥 Downloading GPT-2 model for caption enhancement..."
+python3 -c "
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+print('Loading GPT-2 tokenizer...')
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+print('Loading GPT-2 model...')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+print('✅ GPT-2 model loaded successfully')
+"
+
+echo "✅ All models have been pre-downloaded and cached!"
+echo "📍 Cache location: /var/www/html/python/.cache/huggingface"
+echo "💡 You can now run 'ddev dev-python' without model downloads" 

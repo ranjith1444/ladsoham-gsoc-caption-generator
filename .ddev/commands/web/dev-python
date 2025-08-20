@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -eu
+
+# Go to the python directory
+cd /var/www/html/python
+
+# Set up Hugging Face cache directory to persist models
+export HF_HOME="/var/www/html/python/.cache/huggingface"
+export TRANSFORMERS_CACHE="/var/www/html/python/.cache/huggingface/transformers"
+export HF_DATASETS_CACHE="/var/www/html/python/.cache/huggingface/datasets"
+
+# Create cache directories if they don't exist
+mkdir -p "$HF_HOME"
+mkdir -p "$TRANSFORMERS_CACHE"
+mkdir -p "$HF_DATASETS_CACHE"
+
+# Activate the virtual environment
+source drupal-python/bin/activate
+
+# Set environment variables to reduce downloads
+export HF_HUB_OFFLINE=0
+export HF_HUB_DISABLE_TELEMETRY=1
+export TOKENIZERS_PARALLELISM=false
+
+# Run the FastAPI app with uvicorn (without reload to avoid re-downloads)
+python3 -m uvicorn api:app --host 0.0.0.0 --port 8000

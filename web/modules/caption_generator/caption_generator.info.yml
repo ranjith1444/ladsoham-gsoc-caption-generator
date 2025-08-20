@@ -1,0 +1,24 @@
+name: Image Caption Generator
+description: 'Automatically generates smart captions for the images. In V1 "Alt" tag is auto populated in image field. Primarily it uses open source Hugging Face Model to generate Alt Text. For fast & efficient performance, GEMINI API KEY can also be configured in Media Configuration.'
+package: custom
+
+type: module
+core_version_requirement: ^11
+
+configure: caption_generator.settings
+
+dependencies:
+  - drupal:file
+  - drupal:image
+  # - drupal:views
+  # - webform:webform (>=6.1.0)
+
+# test_dependencies:
+#  - drupal:image
+
+# configure_parameters:
+  # enabledFeature: false
+
+# php: 8.2 #skipable if our module supports the same versions of PHP that Drupal core supports
+
+#DrupalCI - Add composer.json later to for tests

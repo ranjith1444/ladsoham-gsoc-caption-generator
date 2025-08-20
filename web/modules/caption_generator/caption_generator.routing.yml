@@ -1,0 +1,9 @@
+caption_generator.settings:
+  path: '/admin/config/media/caption-generator'
+  defaults:
+    _form: '\Drupal\caption_generator\Form\CaptionGeneratorSettingsForm'
+    _title: 'Caption Generator'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE 

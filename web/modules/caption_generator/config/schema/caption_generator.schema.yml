@@ -1,0 +1,19 @@
+caption_generator.settings:
+  type: config_object
+  label: 'Caption Generator settings'
+  mapping:
+    gemini_api_key:
+      type: string
+      label: 'GEMINI API Key'
+    min_len:
+      type: integer
+      label: 'Minimum caption length (characters)'
+      default: 30
+    max_len:
+      type: integer
+      label: 'Maximum caption length (characters)'
+      default: 60
+    add_emojis:
+      type: boolean
+      label: 'Add emojis to captions'
+      default: false 

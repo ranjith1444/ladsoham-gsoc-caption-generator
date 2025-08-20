@@ -1,0 +1,120 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter() for article forms.
+ */
+function caption_generator_form_node_article_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $image_field = 'field_image';
+
+  // Attach an after_build to the image root and the widget to prefill ALT after upload.
+  if (isset($form[$image_field]) && is_array($form[$image_field])) {
+    $form[$image_field]['#after_build'][] = 'caption_generator_prefill_alt_after_build';
+  }
+  if (isset($form[$image_field]['widget']) && is_array($form[$image_field]['widget'])) {
+    $form[$image_field]['widget']['#after_build'][] = 'caption_generator_prefill_alt_after_build';
+  }
+}
+
+/**
+ * After build callback to prefill ALT text once an image is uploaded.
+ */
+function caption_generator_prefill_alt_after_build(array $element, FormStateInterface $form_state) {
+  // Support both structures: element is either the field root or the widget.
+  $container =& $element;
+  if (isset($element['widget']) && is_array($element['widget'])) {
+    $container =& $element['widget'];
+  }
+
+  // Detect field name from container if available.
+  $field_name = isset($container['#field_name']) ? $container['#field_name'] : (isset($element['#field_name']) ? $element['#field_name'] : 'field_image');
+
+  // Find ALT element in typical first item.
+  if (!isset($container[0]['alt']) || !is_array($container[0]['alt'])) {
+    return $element;
+  }
+  $alt_ref =& $container[0]['alt'];
+
+  // Skip if ALT already has a value (user can edit).
+  $current_alt_value = '';
+  if (isset($alt_ref['#value']) && $alt_ref['#value'] !== '') {
+    $current_alt_value = $alt_ref['#value'];
+  } elseif (isset($alt_ref['#default_value']) && $alt_ref['#default_value'] !== '') {
+    $current_alt_value = $alt_ref['#default_value'];
+  }
+  if ($current_alt_value !== '') {
+    return $element;
+  }
+
+  // Try several places to find the file id for this widget item.
+  $fid = NULL;
+
+  // 1) Values from form state for this field.
+  $image_values = $form_state->getValue($field_name);
+  if (is_array($image_values)) {
+    if (isset($image_values[0]['target_id']) && !empty($image_values[0]['target_id'])) {
+      $fid = $image_values[0]['target_id'];
+    }
+    elseif (isset($image_values['target_id']) && !empty($image_values['target_id'])) {
+      $fid = $image_values['target_id'];
+    }
+    elseif (isset($image_values[0]['fids'][0])) {
+      $fid = $image_values[0]['fids'][0];
+    }
+    elseif (isset($image_values['fids'][0])) {
+      $fid = $image_values['fids'][0];
+    }
+    elseif (isset($image_values[0]) && is_array($image_values[0]) && isset($image_values[0]['fid'])) {
+      $fid = $image_values[0]['fid'];
+    }
+  }
+
+  // 2) Values embedded on the element during rebuild.
+  if (!$fid && isset($container[0]['#value']['target_id']) && !empty($container[0]['#value']['target_id'])) {
+    $fid = $container[0]['#value']['target_id'];
+  }
+  if (!$fid && isset($container[0]['#default_value']['target_id']) && !empty($container[0]['#default_value']['target_id'])) {
+    $fid = $container[0]['#default_value']['target_id'];
+  }
+  if (!$fid && isset($container[0]['fids']['#value'][0])) {
+    $fid = $container[0]['fids']['#value'][0];
+  }
+
+  if (!$fid) {
+    \Drupal::logger('caption_generator')->notice('After build: No fid found for @field.', ['@field' => $field_name]);
+    return $element;
+  }
+
+  try {
+    $file_entity = \Drupal\file\Entity\File::load($fid);
+    if ($file_entity) {
+      $image_path = \Drupal::service('file_system')->realpath($file_entity->getFileUri());
+      if ($image_path && file_exists($image_path)) {
+        $length = 50;
+      $caption_service = \Drupal::service('caption_generator.python_api');
+      $caption = $caption_service->generateCaption($image_path, $length);
+      
+        // Prefill the ALT text field. User can still edit.
+        $alt_ref['#default_value'] = $caption;
+        $alt_ref['#value'] = $caption;
+        \Drupal::logger('caption_generator')->info('After build: ALT prefilled for @field with fid @fid.', ['@field' => $field_name, '@fid' => $fid]);
+      } else {
+        \Drupal::logger('caption_generator')->warning('After build: Image path missing for fid @fid.', ['@fid' => $fid]);
+    }
+  } else {
+      \Drupal::logger('caption_generator')->warning('After build: File entity not found for fid @fid.', ['@fid' => $fid]);
+    }
+  }
+  catch (\Exception $e) {
+    \Drupal::logger('caption_generator')->error('ALT prefill failed: @msg', ['@msg' => $e->getMessage()]);
+  }
+
+  return $element;
+}
+
+
+
+
+
+

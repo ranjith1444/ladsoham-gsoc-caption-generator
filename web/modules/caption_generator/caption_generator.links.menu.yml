@@ -1,0 +1,6 @@
+caption_generator.settings:
+  title: 'Caption Generator'
+  description: 'Configure the Captions that are auto generated while uploading images'
+  route_name: caption_generator.settings
+  parent: system.admin_config_media
+  weight: 100 

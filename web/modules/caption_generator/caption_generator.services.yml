@@ -1,0 +1,7 @@
+services:
+  caption_generator.python_api:
+    class: Drupal\caption_generator\Service\PythonApiService
+    arguments: ['@http_client', '@logger.factory', '@file_system', '@config.factory']
+  caption_generator.caption_service:
+    class: Drupal\caption_generator\Service\CaptionGeneratorService
+    arguments: ['@logger.factory', '@file_system'] 

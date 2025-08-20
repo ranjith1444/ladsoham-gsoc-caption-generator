@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -eu
+
+# Go to project root
+cd /var/www/html
+
+# Create virtual environment in the python folder if not already there
+if [ ! -d "./python/drupal-python" ]; then
+  python3 -m venv python/drupal-python
+fi
+
+# Activate virtual environment
+source python/drupal-python/bin/activate
+
+# Install dependencies
+pip install -r python/requirements.txt
+
+echo "✅ Python virtual environment is ready and requirements are installed."
