@@ -81,10 +81,7 @@ Restart your Docker container or web server. The system will automatically:
 
 Watch the complete installation and usage process:
 
-<video autoplay muted loop>
-  <source src="readme-resources/sample-recording.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[![Watch the video](https://raw.githubusercontent.com/SohamLad14/ladsoham-gsoc-caption-generator/main/readme-resources/result-gemini.jpeg)](https://raw.githubusercontent.com/SohamLad14/ladsoham-gsoc-caption-generator/main/readme-resources/sample-recording.mp4)
 
 ## DDEV Integration (Recommended)
 
