@@ -16,7 +16,7 @@ MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app = FastAPI(title="AI Image Caption Generator API")
+app = FastAPI(title="Image Caption Generator API", discription="API for generating captions and labels from images using vision and language models.")
 
 app.add_middleware(
     CORSMiddleware,
