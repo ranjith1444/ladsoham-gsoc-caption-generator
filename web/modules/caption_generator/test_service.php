@@ -11,7 +11,8 @@ require_once DRUPAL_ROOT . '/autoload.php';
 $kernel = new \Drupal\Core\DrupalKernel('prod', \Drupal\Core\Site\Settings::getInstance(), FALSE);
 $kernel->boot();
 $kernel->preHandle();
-
+$tests_passed = 0;
+$tests_failed = 0;
 echo "=== Service Availability Test ===\n\n";
 
 // Test 1: Check if services are available
@@ -27,8 +28,10 @@ foreach ($services_to_test as $service_name) {
         $service = \Drupal::service($service_name);
         echo "   $service_name: AVAILABLE\n";
         echo "   Class: " . get_class($service) . "\n";
+        $tests_passed++;
     } catch (\Exception $e) {
         echo "   $service_name: ERROR - " . $e->getMessage() . "\n";
+        $tests_failed++;
     }
 }
 
@@ -40,8 +43,10 @@ try {
     // Test if the service has the expected method
     if (method_exists($python_api, 'generateCaption')) {
         echo "   generateCaption method exists\n";
+        $tests_failed++; 
     } else {
         echo "   generateCaption method NOT found\n";
+        $tests_failed++;
     }
     
 } catch (\Exception $e) {
@@ -49,3 +54,5 @@ try {
 }
 
 echo "\n=== Test Complete ===\n"; 
+echo "Tests Passed: $tests_passed\n";
+echo "Tests Failed: $tests_failed\n";
